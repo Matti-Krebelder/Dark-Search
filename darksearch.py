@@ -129,8 +129,9 @@ def print_menu():
     print(f"{Fore.CYAN}║{Fore.WHITE} 1. Search                          {Fore.CYAN}║")
     print(f"{Fore.CYAN}║{Fore.WHITE} 2. Configure Search Engines        {Fore.CYAN}║") 
     print(f"{Fore.CYAN}║{Fore.WHITE} 3. Set Proxy                       {Fore.CYAN}║")
-    print(f"{Fore.CYAN}║{Fore.WHITE} 4. Help                            {Fore.CYAN}║")
-    print(f"{Fore.CYAN}║{Fore.WHITE} 5. Exit                            {Fore.CYAN}║")
+    print(f"{Fore.CYAN}║{Fore.WHITE} 4. Configure Max Displayed Results {Fore.CYAN}║")
+    print(f"{Fore.CYAN}║{Fore.WHITE} 5. Help                            {Fore.CYAN}║")
+    print(f"{Fore.CYAN}║{Fore.WHITE} 6. Exit                            {Fore.CYAN}║")
     print(f"{Fore.CYAN}╚══════════════════════════════════════╝{Style.RESET_ALL}")
 
 def print_engine_menu():
@@ -191,7 +192,7 @@ def print_help():
     print(f"{Fore.YELLOW}║{Fore.WHITE} 1. Ensure Tor is running (default: localhost:9050)             {Fore.YELLOW}║")
     print(f"{Fore.YELLOW}║{Fore.WHITE} 2. Enter your search query                                     {Fore.YELLOW}║")
     print(f"{Fore.YELLOW}║{Fore.WHITE} 3. View results in real-time                                   {Fore.YELLOW}║")
-    print(f"{Fore.YELLOW}║{Fore.WHITE} 4. Results are saved to a CSV file                             {Fore.YELLOW}║")
+    print(f"{Fore.YELLOW}║{Fore.WHITE} 4. Results are saved to a txt file                             {Fore.YELLOW}║")
     print(f"{Fore.YELLOW}║{Fore.WHITE}                                                                {Fore.YELLOW}║")
     print(f"{Fore.YELLOW}║{Fore.WHITE} DISCLAIMER:                                                    {Fore.YELLOW}║")
     print(f"{Fore.YELLOW}║{Fore.RED} This tool is for educational purposes only. The creators are not {Fore.YELLOW}║")
@@ -960,7 +961,7 @@ def display_results(results, max_displayed=None):
     for domain in sorted_domains:
         if displayed_count >= max_displayed:
             remaining = len(results) - displayed_count
-            print(f"\n{Fore.YELLOW}... and {remaining} more results not shown. Export to CSV for complete results.{Style.RESET_ALL}")
+            print(f"\n{Fore.YELLOW}... and {remaining} more results not shown. Export to txt for complete results.{Style.RESET_ALL}")
             break
         
         domain_results = results_by_domain[domain]
@@ -1036,7 +1037,7 @@ def interactive_mode_loop():
         print_header()
         print_menu()
         
-        choice = input(f"\n{Fore.GREEN}Enter your choice (1-5): {Style.RESET_ALL}").strip()
+        choice = input(f"\n{Fore.GREEN}Enter your choice (1-6): {Style.RESET_ALL}").strip()
         
         if choice == '1':  # Search
             print_header()
@@ -1052,7 +1053,7 @@ def interactive_mode_loop():
                 if results:
                     display_results(results)
                     
-                    save_option = input(f"\n{Fore.GREEN}Save results to CSV? (y/n): {Style.RESET_ALL}").strip().lower()
+                    save_option = input(f"\n{Fore.GREEN}Save results to txt? (y/n): {Style.RESET_ALL}").strip().lower()
                     if save_option == 'y':
                         save_results_to_txt(results, search_query)
                 
@@ -1064,10 +1065,13 @@ def interactive_mode_loop():
         elif choice == '3':  # Set Proxy
             proxies = set_proxy()
         
-        elif choice == '4':  # Help
+        elif choice == '4':  # Configure Max Displayed Results
+            configure_max_displayed_results()
+        
+        elif choice == '5':  # Help
             print_help()
         
-        elif choice == '5':  # Exit
+        elif choice == '6':  # Exit
             print(f"\n{Fore.YELLOW}Exiting...{Style.RESET_ALL}")
             sys.exit(0)
         
@@ -1081,7 +1085,7 @@ def main():
     parser.add_argument('-s', '--search', help='Search query')
     parser.add_argument('-e', '--engines', help='Comma-separated list of search engines to use')
     parser.add_argument('-p', '--proxy', help='SOCKS proxy to use (default: localhost:9050)')
-    parser.add_argument('-o', '--output', help='Output file for results (CSV format)')
+    parser.add_argument('-o', '--output', help='Output file for results (txt formart)')
     parser.add_argument('-l', '--limit', type=int, default=0, help='Limit number of pages per search engine')
     parser.add_argument('-i', '--interactive', action='store_true', help='Run in interactive mode')
     
@@ -1124,7 +1128,7 @@ def main():
     print(f"{Fore.GREEN}[+] Searching for: {args.search}{Style.RESET_ALL}")
     results = perform_search(args.search, proxies)
     
-    # Save results to CSV
+    # Save results to txt
     if results:
         save_results_to_txt(results, args.search, args.output)
 
