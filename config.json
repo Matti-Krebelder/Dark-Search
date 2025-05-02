@@ -1,0 +1,11 @@
+{
+    "proxy": "127.0.0.1:9050",
+    "max_results": 50,
+    "active_engines": [
+        "phobos",
+        "onionland",
+        "tor66",
+        "haystack"
+    ],
+    "threads": 3
+}
