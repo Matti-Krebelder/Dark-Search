@@ -968,7 +968,7 @@ def display_results(results, max_displayed=None):
         print(f"\n{Fore.MAGENTA}Domain: {Fore.WHITE}{domain} {Fore.YELLOW}({len(domain_results)} results){Style.RESET_ALL}")
         
         # Display a subset of results for each domain
-        for i, result in enumerate(domain_results[:3]):  # Show max 3 results per domain
+        for i, result in enumerate(domain_results[:25]):
             if displayed_count >= max_displayed:
                 break
             
