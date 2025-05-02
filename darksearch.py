@@ -875,8 +875,8 @@ def perform_search(searchstr, proxies):
     
     return all_results
 
-def save_results_to_csv(results, search_query, output_file=None):
-    """Save search results to a CSV file"""
+def save_results_to_txt(results, search_query, output_file=None):
+    """Save search results to a text file"""
     if not results:
         print(f"{Fore.YELLOW}[!] No results to save.{Style.RESET_ALL}")
         return None
@@ -885,13 +885,17 @@ def save_results_to_csv(results, search_query, output_file=None):
     if output_file is None:
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         sanitized_query = re.sub(r'[^\w\s-]', '', search_query).replace(' ', '_')
-        output_file = f"torsearch_{sanitized_query}_{timestamp}.csv"
+        output_file = f"torsearch_{sanitized_query}_{timestamp}.txt"
     
     try:
-        with open(output_file, 'w', newline='', encoding='utf-8') as f:
-            writer = csv.DictWriter(f, fieldnames=available_csv_fields)
-            writer.writeheader()
-            writer.writerows(results)
+        with open(output_file, 'w', encoding='utf-8') as f:
+            for i, result in enumerate(results, start=1):
+                f.write(f"Result {i}:\n")
+                f.write(f"  Engine: {result.get('engine', '')}\n")
+                f.write(f"  Name: {result.get('name', '')}\n")
+                f.write(f"  Link: {result.get('link', '')}\n")
+                f.write(f"  Domain: {result.get('domain', '')}\n")
+                f.write("\n")
         
         print(f"{Fore.GREEN}[+] Results saved to: {output_file}{Style.RESET_ALL}")
         return output_file
@@ -899,8 +903,37 @@ def save_results_to_csv(results, search_query, output_file=None):
         print(f"{Fore.RED}[!] Error saving results: {str(e)}{Style.RESET_ALL}")
         return None
 
-def display_results(results, max_displayed=20):
+import json
+
+CONFIG_FILE = "vpn_config.json"
+
+# Default configuration
+default_config = {
+    "max_displayed_results": 50
+}
+
+def load_config():
+    try:
+        with open(CONFIG_FILE, "r") as f:
+            config = json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        config = default_config
+        save_config(config)
+    return config
+
+def save_config(config):
+    try:
+        with open(CONFIG_FILE, "w") as f:
+            json.dump(config, f, indent=4)
+    except Exception as e:
+        print(f"{Fore.RED}[!] Error saving config: {str(e)}{Style.RESET_ALL}")
+
+config = load_config()
+
+def display_results(results, max_displayed=None):
     """Display search results in the terminal"""
+    if max_displayed is None:
+        max_displayed = config.get("max_displayed_results", 50)
     if not results:
         print(f"{Fore.YELLOW}No results found.{Style.RESET_ALL}")
         return
@@ -1021,7 +1054,7 @@ def interactive_mode_loop():
                     
                     save_option = input(f"\n{Fore.GREEN}Save results to CSV? (y/n): {Style.RESET_ALL}").strip().lower()
                     if save_option == 'y':
-                        save_results_to_csv(results, search_query)
+                        save_results_to_txt(results, search_query)
                 
                 input(f"\n{Fore.CYAN}Press Enter to continue...{Style.RESET_ALL}")
         
@@ -1093,7 +1126,7 @@ def main():
     
     # Save results to CSV
     if results:
-        save_results_to_csv(results, args.search, args.output)
+        save_results_to_txt(results, args.search, args.output)
 
 if __name__ == "__main__":
     freeze_support()
